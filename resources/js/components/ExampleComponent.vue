@@ -1,40 +1,33 @@
 <script>
-import { Calendar } from '@fullcalendar/core';
-import '@fullcalendar/core/vdom' // solves problem with Vite
-import FullCalendar from '@fullcalendar/vue'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
 
-// let calendarEl = document.getElementById('calendar');
-//
-// let calendar = new Calendar(calendarEl, {
-//     plugins: [ interactionPlugin ],
-//     // ...
-//         dateClick: function(info) {
-//     alert('Clicked on: ' + info.dateStr);
-//     alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-//     alert('Current view: ' + info.view.type);
-//     // change the day's background color just for fun
-//     info.dayEl.style.backgroundColor = 'red';
-// }
-// });
+import FullCalendar from '@fullcalendar/vue'
+import DayGridPlugin from '@fullcalendar/daygrid'
+import TimeGridPlugin from '@fullcalendar/timegrid'
+import InteractionPlugin from '@fullcalendar/interaction'
+import ListPlugin from '@fullcalendar/list'
 
 export default {
-    components: {
-        FullCalendar // make the <FullCalendar> tag available
-    },
+
     data() {
         return {
             calendarOptions: {
-                plugins: [ dayGridPlugin, interactionPlugin ],
+                plugins: [ DayGridPlugin, InteractionPlugin, TimeGridPlugin, ListPlugin],
                 initialView: 'dayGridMonth'
             }
         }
+    },
+    components: {
+        FullCalendar // make the <FullCalendar> tag available
     }
 }
-console.log('Works in vue')
-
 </script>
 <template>
-    <FullCalendar :options="calendarOptions" />
+    <FullCalendar
+        :options="calendarOptions"
+        :header="{
+            left: '',
+            center: 'today',
+            right: ''
+        }"
+    />
 </template>
