@@ -1,6 +1,3 @@
----------------------------------------------------------------CalendarComponent-------------------------------------------------
-
-
 <template>
     <div class="container">
         <div class="row justify-content-center">
@@ -57,14 +54,13 @@
 </template>
 
 <script>
+
 import Fullcalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import dayGridWeek from "@fullcalendar/daygrid";
 import listWeek from "@fullcalendar/list"
 import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
-
-
 
 export default {
     components: {
@@ -75,7 +71,7 @@ export default {
             calendarPlugins: [dayGridPlugin, interactionPlugin, dayGridWeek, listWeek],
             events: [{
                 events(start, end, timezone, callback) {
-                    axios.get('http://localhost:8000/api/calendar').then(res => {
+                    axios.get('/api/calendar').then(res => {
                         callback(res.data.data)
                     })
                 },
@@ -88,7 +84,7 @@ export default {
                 start_date: "",
                 end_date: ""
             },
-            addingMode: false,
+            addingMode: true,
             indexToUpdate: ""
         };
     },
@@ -97,7 +93,6 @@ export default {
     },
     methods: {
         addNewEvent() {
-            console.log("add");
             axios
                 .post("/api/calendar", {
                     ...this.newEvent
@@ -111,7 +106,6 @@ export default {
                 );
         },
         showEvent(arg) {
-            console.log("show");
             this.addingMode = true;
             const { id, title, start, end } = this.events.find(
                 event => event.id === +arg.event.id
@@ -122,10 +116,8 @@ export default {
                 start_date: start,
                 end_date: end
             };
-            console.log(this.newEvent);
         },
         updateEvent() {
-            console.log("update");
             axios
                 .put("/api/calendar/" + this.indexToUpdate, {
                     ...this.newEvent
@@ -140,7 +132,6 @@ export default {
                 );
         },
         deleteEvent() {
-            console.log("delete");
             axios
                 .delete("/api/calendar/" + this.indexToUpdate)
                 .then(resp => {
@@ -153,15 +144,12 @@ export default {
                 );
         },
         getEvents() {
-            console.log("get");
             let data = axios
                 .get("/api/calendar")
                 .then(resp => (this.events = resp.data.data))
                 .catch(err => console.log(err.response.data));
-            console.log(data);
         },
         resetForm() {
-            console.log("reset");
             Object.keys(this.newEvent).forEach(key => {
                 return (this.newEvent[key] = "");
             });

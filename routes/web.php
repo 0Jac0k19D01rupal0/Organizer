@@ -20,5 +20,7 @@ Route::get('/', function () {
 Route::get('/calendar', function () {
     return view('welcome');
 });
+Route::get('/events', [EventController::class, 'calendarEvents']);
+
 
 require __DIR__.'/auth.php';

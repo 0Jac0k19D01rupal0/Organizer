@@ -120,6 +120,4 @@ class EventController extends Controller
         );
         var_dump($data);
     }
-
-
 }

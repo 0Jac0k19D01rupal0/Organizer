@@ -69,7 +69,6 @@
     </head>
     <body>
         <div id="app">
-            <br>
             <example-component></example-component>
         </div>
 
