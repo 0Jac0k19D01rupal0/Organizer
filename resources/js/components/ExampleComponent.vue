@@ -1,33 +1,183 @@
-<script>
+---------------------------------------------------------------CalendarComponent-------------------------------------------------
 
-import FullCalendar from '@fullcalendar/vue'
-import DayGridPlugin from '@fullcalendar/daygrid'
-import TimeGridPlugin from '@fullcalendar/timegrid'
-import InteractionPlugin from '@fullcalendar/interaction'
-import ListPlugin from '@fullcalendar/list'
+
+<template>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form @submit.prevent>
+                    <div class="form-group">
+                        <label for="event_name">Event Name</label>
+                        <input type="text" id="event_name" class="form-control" v-model="newEvent.event_name">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="start_date">Start Date</label>
+                                <input
+                                    type="date"
+                                    id="start_date"
+                                    class="form-control"
+                                    v-model="newEvent.start_date"
+                                >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="end_date">End Date</label>
+                                <input type="date" id="end_date" class="form-control" v-model="newEvent.end_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4" v-if="addingMode">
+                            <button class="btn btn-sm btn-primary" @click="addNewEvent">Save Event</button>
+                        </div>
+                        <template v-else>
+                            <div class="col-md-6 mb-4">
+                                <button class="btn btn-sm btn-success" @click="updateEvent">Update</button>
+                                <button class="btn btn-sm btn-danger" @click="deleteEvent">Delete</button>
+                                <button class="btn btn-sm btn-secondary" @click="addingMode = !addingMode">Cancel</button>
+                            </div>
+                        </template>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-8">
+                <Fullcalendar @eventClick="showEvent"
+                              :plugins="calendarPlugins"
+                              :events="events"
+                              :header="{
+                    left: 'prev, next today',
+                    center: 'title',
+                    right: 'dayGridMonth, dayGridWeek, listWeek',
+                }"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import Fullcalendar from "@fullcalendar/vue";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import dayGridWeek from "@fullcalendar/daygrid";
+import listWeek from "@fullcalendar/list"
+import interactionPlugin from "@fullcalendar/interaction";
+import axios from "axios";
+
+
 
 export default {
-
+    components: {
+        Fullcalendar
+    },
     data() {
         return {
-            calendarOptions: {
-                plugins: [ DayGridPlugin, InteractionPlugin, TimeGridPlugin, ListPlugin],
-                initialView: 'dayGridMonth'
+            calendarPlugins: [dayGridPlugin, interactionPlugin, dayGridWeek, listWeek],
+            events: [{
+                events(start, end, timezone, callback) {
+                    axios.get('http://localhost:8000/api/calendar').then(res => {
+                        callback(res.data.data)
+                    })
+                },
+                color: 'blue',
+                textColor: 'white',
             }
-        }
+            ],
+            newEvent: {
+                event_name: "",
+                start_date: "",
+                end_date: ""
+            },
+            addingMode: false,
+            indexToUpdate: ""
+        };
     },
-    components: {
-        FullCalendar // make the <FullCalendar> tag available
+    created() {
+        this.getEvents();
+    },
+    methods: {
+        addNewEvent() {
+            console.log("add");
+            axios
+                .post("/api/calendar", {
+                    ...this.newEvent
+                })
+                .then(data => {
+                    this.getEvents(); // update our list of events
+                    this.resetForm(); // clear newEvent properties (e.g. title, start_date and end_date)
+                })
+                .catch(err =>
+                    console.log("Unable to add new event!", err.response.data)
+                );
+        },
+        showEvent(arg) {
+            console.log("show");
+            this.addingMode = true;
+            const { id, title, start, end } = this.events.find(
+                event => event.id === +arg.event.id
+            );
+            this.indexToUpdate = id;
+            this.newEvent = {
+                event_name: title,
+                start_date: start,
+                end_date: end
+            };
+            console.log(this.newEvent);
+        },
+        updateEvent() {
+            console.log("update");
+            axios
+                .put("/api/calendar/" + this.indexToUpdate, {
+                    ...this.newEvent
+                })
+                .then(resp => {
+                    this.resetForm();
+                    this.getEvents();
+                    this.addingMode = !this.addingMode;
+                })
+                .catch(err =>
+                    console.log("Unable to update event!", err.response.data)
+                );
+        },
+        deleteEvent() {
+            console.log("delete");
+            axios
+                .delete("/api/calendar/" + this.indexToUpdate)
+                .then(resp => {
+                    this.resetForm();
+                    this.getEvents();
+                    this.addingMode = !this.addingMode;
+                })
+                .catch(err =>
+                    console.log("Unable to delete event!", err.response.data)
+                );
+        },
+        getEvents() {
+            console.log("get");
+            let data = axios
+                .get("/api/calendar")
+                .then(resp => (this.events = resp.data.data))
+                .catch(err => console.log(err.response.data));
+            console.log(data);
+        },
+        resetForm() {
+            console.log("reset");
+            Object.keys(this.newEvent).forEach(key => {
+                return (this.newEvent[key] = "");
+            });
+        },
+    },
+    watch: {
+        indexToUpdate() {
+            return this.indexToUpdate;
+        }
     }
-}
+};
 </script>
-<template>
-    <FullCalendar
-        :options="calendarOptions"
-        :header="{
-            left: '',
-            center: 'today',
-            right: ''
-        }"
-    />
-</template>
+
+<style lang="css">
+@import "~@fullcalendar/core/main.css";
+@import "~@fullcalendar/daygrid/main.css";
+
+</style>
+

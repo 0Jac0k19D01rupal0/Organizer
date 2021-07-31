@@ -48,10 +48,10 @@ class EventController extends Controller
      */
     public function store(EventRequest $request)
     {
-        $event = $request->all();
+        $new_event = Event::create($request->all());
 
         return response()->json([
-            'date' => new EventResource($event),
+            'date' => new EventResource($new_event),
             'message' => 'Event added successfully!!',
             'status' => Response::HTTP_CREATED
         ]);
