@@ -69,7 +69,7 @@
     </head>
     <body>
         <div id="app">
-            <example-component></example-component>
+            <calendar-component></calendar-component>
         </div>
 
         <script src="{{ asset('js/app.js') }}"></script>
