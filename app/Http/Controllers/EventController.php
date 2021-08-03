@@ -4,26 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EventRequest;
 use App\Http\Resources\EventResource;
-use App\Repositories\EventsRepository;
 use App\Models\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Berkayk\OneSignal\OneSignalFacade;
 
 class EventController extends Controller
 {
-
-    public $eventsRepository;
-
-    /**
-     * EventController constructor.
-     *
-     * @param EventsRepository $eventsRepository
-     */
-    public function __construct(EventsRepository $eventsRepository)
-    {
-        $this->eventsRepository = $eventsRepository;
-    }
-
 
     /**
      * Display a listing of the event
