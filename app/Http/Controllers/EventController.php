@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use OneSignal;
+use App\Models\Event;
 use App\Http\Requests\EventRequest;
 use App\Http\Resources\EventResource;
-use App\Models\Event;
 use Symfony\Component\HttpFoundation\Response;
-use Berkayk\OneSignal\OneSignalFacade;
+
 
 class EventController extends Controller
 {
@@ -35,6 +36,11 @@ class EventController extends Controller
     public function store(EventRequest $request)
     {
         $new_event = Event::create($request->all());
+
+        // Create push notification
+        $event_name = $request->input('event_name');
+        $event_start = $request->input('start_date');
+        $this->testTimeNotification($event_name, $event_start);
 
         return response()->json([
             'date' => new EventResource($new_event),
@@ -74,7 +80,19 @@ class EventController extends Controller
      */
     public function update(EventRequest $request, Event $event)
     {
+        global $notificationID;
+
         $event->update($request->all());
+
+        // Update push notification
+        $event_name = $request->input('event_name');
+        $event_start = $request->input('start_date');
+
+        // Cancel push notification by id notification
+        $this->cancelNotification($notificationID);
+
+        $this->testTimeNotification($event_name, $event_start);
+
         return response()->json([
             'data' => new EventResource($event),
             'message' => "Event updated successfully!!",
@@ -97,13 +115,73 @@ class EventController extends Controller
 
     public function notification()
     {
-        $data = OneSignalFacade::sendNotificationToAll(
+       \OneSignal::sendNotificationToAll(
             "Some Message",
-            $url = 'sdfsf',
-            $data = 'sdgfdsf',
+            $url = null,
+            $data = null,
             $buttons = null,
-            $schedule = 'fsdfsdf'
+            $schedule = null
         );
-        var_dump($data);
+    }
+
+    public function testRequestForNotification()
+    {
+
+    }
+
+    /**
+     * Create push notification
+     *
+     * @return mixed
+     */
+    public function testTimeNotification($event_name, $start_date)
+    {
+        global $notificationID;
+
+        $userId = "a259b549-b42b-447b-9e3b-acd40cf6f067"; // UserId Web One Signal
+        $params = [];
+        $params['include_player_ids'] = [$userId];
+        $contents = [
+            "en" => $event_name,
+        ];
+        $params['contents'] = $contents;
+//        $params['delayed_option'] = "UTC+300"; // Will deliver on user's timezone
+        $params['send_after'] = $start_date;
+//        $params['delivery_time_of_day'] = "1:15"; // Delivery time
+
+        /// In this part get response from OneSignal
+        $dataOneSignal = \OneSignal::sendNotificationCustom($params);
+
+        $responseOneSignal = $dataOneSignal->getBody();
+        $decodedResponse = json_decode($responseOneSignal);
+        $notificationID = $decodedResponse->id();
+    }
+
+
+    /**
+     * Cancel push notification
+     *
+     */
+    public function cancelNotification($notificationId)
+    {
+        $ch = curl_init();
+        $appId = getenv("ONESIGNAL_APP_ID");
+        $restApi = getenv("ONESIGNAL_REST_API_KEY");
+        $httpHeader = array(
+            'Authorization: Basic' . $restApi
+        );
+        $notificationId = "61eb2c9e-92cb-4926-8494-a56ef8df8a9a";
+
+        $url = "https://onesignal.com/api/v1/notifications/" . $notificationId . "?app_id=" . $appId;
+
+        $options = array (
+            CURLOPT_URL => $url,
+            CURLOPT_HTTPHEADER => $httpHeader,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_CUSTOMREQUEST => "DELETE",
+        );
+        curl_setopt_array($ch, $options);
+        $response = curl_exec($ch);
+        curl_close($ch);
     }
 }

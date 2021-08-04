@@ -5,7 +5,12 @@
                 <form @submit.prevent>
                     <div class="form-group">
                         <label for="event_name">Event Name</label>
-                        <input type="text" id="event_name" class="form-control" v-model="newEvent.event_name">
+                        <input
+                            type="text"
+                            id="event_name"
+                            class="form-control"
+                            v-model="newEvent.event_name"
+                        >
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -22,7 +27,11 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="end_date">End Date</label>
-                                <input type="date" id="end_date" class="form-control" v-model="newEvent.end_date">
+                                <input
+                                    type="date"
+                                    id="end_date"
+                                    class="form-control"
+                                    v-model="newEvent.end_date">
                             </div>
                         </div>
                         <div class="col-md-6 mb-4" v-if="addingMode">
