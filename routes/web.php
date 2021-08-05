@@ -15,11 +15,5 @@ use App\Http\Controllers\CalendarController;
 
 Route::get('/', [CalendarController::class, 'index']);
 
-Route::get('/testRequest', [\App\Http\Controllers\EventController::class, 'testRequestForNotification']);
-
-Route::get('/testNotification', [\App\Http\Controllers\EventController::class, 'testTimeNotification']);
-
-Route::get('/cancelNotification', [\App\Http\Controllers\EventController::class, 'cancelNotification']);
-
 require __DIR__.'/auth.php';
 

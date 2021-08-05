@@ -22,10 +22,9 @@ class EventFactory extends Factory
     public function definition()
     {
         return [
-//            'user_id' => $this->faker->numberBetween(1,5),
             'title' => $this->faker->sentence(5, false),
-//            'time' => $this->faker->dateTimeBetween('-1 year', '+1 year'),
-            'description' => $this->faker->sentence(6, true)
+            'start_date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
+            'end_date' => $this->faker->dateTimeBetween('-1 year', '+1 year'),
         ];
     }
 }

@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EventController extends Controller
 {
-
     /**
      * Display a listing of the event
      *
@@ -20,11 +19,6 @@ class EventController extends Controller
     public function index()
     {
         return EventResource::collection(Event::all());
-    }
-
-    public function create()
-    {
-
     }
 
     /**
@@ -40,7 +34,8 @@ class EventController extends Controller
         // Create push notification
         $event_name = $request->input('event_name');
         $event_start = $request->input('start_date');
-        $this->testTimeNotification($event_name, $event_start);
+
+        $this->createPushNotification($event_name, $event_start);
 
         return response()->json([
             'date' => new EventResource($new_event),
@@ -48,7 +43,6 @@ class EventController extends Controller
             'status' => Response::HTTP_CREATED
         ]);
     }
-
 
     /**
      * Display event
@@ -62,16 +56,6 @@ class EventController extends Controller
     }
 
     /**
-     * Edit event
-     *
-     * @param Event $event
-     */
-    public function edit(Event $event)
-    {
-
-    }
-
-    /**
      * Update event
      *
      * @param EventRequest $request
@@ -80,17 +64,10 @@ class EventController extends Controller
      */
     public function update(EventRequest $request, Event $event)
     {
-        global $notificationID;
-
         $event->update($request->all());
 
-        // Update push notification
         $event_name = $request->input('event_name');
         $event_start = $request->input('start_date');
-
-        // Cancel push notification by id notification
-        $this->cancelNotification($notificationID);
-
         $this->testTimeNotification($event_name, $event_start);
 
         return response()->json([
@@ -113,75 +90,22 @@ class EventController extends Controller
         return response('Event deleted!!', Response::HTTP_NO_CONTENT);
     }
 
-    public function notification()
-    {
-       \OneSignal::sendNotificationToAll(
-            "Some Message",
-            $url = null,
-            $data = null,
-            $buttons = null,
-            $schedule = null
-        );
-    }
-
-    public function testRequestForNotification()
-    {
-
-    }
-
     /**
      * Create push notification
      *
      * @return mixed
      */
-    public function testTimeNotification($event_name, $start_date)
+    public function createPushNotification($event_name, $start_date)
     {
-        global $notificationID;
-
-        $userId = "a259b549-b42b-447b-9e3b-acd40cf6f067"; // UserId Web One Signal
+        $userId = "a259b549-b42b-447b-9e3b-acd40cf6f067"; // UserId Subscriber Web One Signal
         $params = [];
         $params['include_player_ids'] = [$userId];
         $contents = [
             "en" => $event_name,
         ];
         $params['contents'] = $contents;
-//        $params['delayed_option'] = "UTC+300"; // Will deliver on user's timezone
         $params['send_after'] = $start_date;
-//        $params['delivery_time_of_day'] = "1:15"; // Delivery time
 
-        /// In this part get response from OneSignal
-        $dataOneSignal = \OneSignal::sendNotificationCustom($params);
-
-        $responseOneSignal = $dataOneSignal->getBody();
-        $decodedResponse = json_decode($responseOneSignal);
-        $notificationID = $decodedResponse->id();
-    }
-
-
-    /**
-     * Cancel push notification
-     *
-     */
-    public function cancelNotification($notificationId)
-    {
-        $ch = curl_init();
-        $appId = getenv("ONESIGNAL_APP_ID");
-        $restApi = getenv("ONESIGNAL_REST_API_KEY");
-        $httpHeader = array(
-            'Authorization: Basic' . $restApi
-        );
-        $notificationId = "61eb2c9e-92cb-4926-8494-a56ef8df8a9a";
-
-        $url = "https://onesignal.com/api/v1/notifications/" . $notificationId . "?app_id=" . $appId;
-
-        $options = array (
-            CURLOPT_URL => $url,
-            CURLOPT_HTTPHEADER => $httpHeader,
-            CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_CUSTOMREQUEST => "DELETE",
-        );
-        curl_setopt_array($ch, $options);
-        $response = curl_exec($ch);
-        curl_close($ch);
+         \OneSignal::sendNotificationCustom($params);
     }
 }

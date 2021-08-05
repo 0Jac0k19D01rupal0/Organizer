@@ -15226,21 +15226,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   data: function data() {
     return {
       calendarPlugins: [(_fullcalendar_daygrid__WEBPACK_IMPORTED_MODULE_1___default()), (_fullcalendar_interaction__WEBPACK_IMPORTED_MODULE_3___default()), (_fullcalendar_daygrid__WEBPACK_IMPORTED_MODULE_1___default()), (_fullcalendar_list__WEBPACK_IMPORTED_MODULE_2___default())],
-      events: [{
-        events: function events(start, end, timezone, callback) {
-          axios__WEBPACK_IMPORTED_MODULE_4___default().get('http://localhost:8000/api/calendar').then(function (res) {
-            callback(res.data.data);
-          });
-        },
-        color: 'blue',
-        textColor: 'white'
-      }],
+      events: "",
       newEvent: {
         event_name: "",
         start_date: "",
         end_date: ""
       },
-      addingMode: false,
+      addingMode: true,
       indexToUpdate: ""
     };
   },
@@ -15251,7 +15243,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     addNewEvent: function addNewEvent() {
       var _this = this;
 
-      console.log("add");
       axios__WEBPACK_IMPORTED_MODULE_4___default().post("/api/calendar", _objectSpread({}, this.newEvent)).then(function (data) {
         _this.getEvents(); // update our list of events
 
@@ -15263,7 +15254,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
     },
     showEvent: function showEvent(arg) {
-      console.log("show");
       this.addingMode = true;
 
       var _this$events$find = this.events.find(function (event) {
@@ -15280,12 +15270,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         start_date: start,
         end_date: end
       };
-      console.log(this.newEvent);
     },
     updateEvent: function updateEvent() {
       var _this2 = this;
 
-      console.log("update");
       axios__WEBPACK_IMPORTED_MODULE_4___default().put("/api/calendar/" + this.indexToUpdate, _objectSpread({}, this.newEvent)).then(function (resp) {
         _this2.resetForm();
 
@@ -15299,7 +15287,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     deleteEvent: function deleteEvent() {
       var _this3 = this;
 
-      console.log("delete");
       axios__WEBPACK_IMPORTED_MODULE_4___default().delete("/api/calendar/" + this.indexToUpdate).then(function (resp) {
         _this3.resetForm();
 
@@ -15313,18 +15300,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     getEvents: function getEvents() {
       var _this4 = this;
 
-      console.log("get");
-      var data = axios__WEBPACK_IMPORTED_MODULE_4___default().get("/api/calendar").then(function (resp) {
+      axios__WEBPACK_IMPORTED_MODULE_4___default().get("/api/calendar").then(function (resp) {
         return _this4.events = resp.data.data;
       })["catch"](function (err) {
         return console.log(err.response.data);
       });
-      console.log(data);
     },
     resetForm: function resetForm() {
       var _this5 = this;
 
-      console.log("reset");
       Object.keys(this.newEvent).forEach(function (key) {
         return _this5.newEvent[key] = "";
       });
@@ -15404,6 +15388,19 @@ try {
 
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+/**
+ * Next we will register the CSRF Token as a common header with Axios so that
+ * all outgoing HTTP requests automatically have it attached. This is just
+ * a simple convenience so we don't have to attach every token manually.
+ */
+
+var token = document.head.querySelector('meta[name="csrf-token"]');
+
+if (token) {
+  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
