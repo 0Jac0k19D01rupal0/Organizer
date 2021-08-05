@@ -1,6 +1,6 @@
 # Organizer
 
-This app allows students to add data on the site. 
+This app allows users to create events on the site and get push notification when event start. 
 
 
 ## Requirements
@@ -11,7 +11,8 @@ This app allows students to add data on the site.
 ## How to Deploy
 
 1. Cloning repository: `git clone https://github.com/0Jac0k19D01rupal0/Organizer.git`
-2. Create your own database and config .env:
+2. Rename .env.example: mv .env.example .env
+3. Create your own database and config .env:
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -20,7 +21,7 @@ DB_DATABASE=your_database
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 
-3. Create your own OneSignal account on https://app.onesignal.com/signup and config .env:
+3. Create your own OneSignal account on https://app.onesignal.com/signup, config OneSiganal by https://documentation.onesignal.com/docs/web-push-quickstart and config .env:
 
 ONESIGNAL_APP_ID=your_APP_ID
 USER_AUTH_KEY=your_AUTH_KEY
@@ -36,9 +37,11 @@ ONESIGNAL_REST_API_KEY=your_REST_API_KEY
 `npm run watch`
 
 10. Go to your site.
-
+http://127.0.0.1:8000
 
 ## How load fixtures
 
 `php artisan tinker`
 `\App\Models\EventFactory::factory()->times(10)->create();`
+`\App\Models\UserFactory::factory()->times(10)->create();`
+
