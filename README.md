@@ -1,4 +1,4 @@
-# University
+# Organizer
 
 This app allows students to add data on the site. 
 
