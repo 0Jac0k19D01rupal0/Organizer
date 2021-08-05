@@ -7,6 +7,7 @@ This app allows users to create events on the site and get push notification whe
 
 * PHP ^7.3|^8.0"
 * Composer
+* Node js 12.22.4
 
 ## How to Deploy
 
@@ -21,17 +22,17 @@ DB_DATABASE=your_database
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 
-3. Create your own OneSignal account on https://app.onesignal.com/signup, config OneSiganal by https://documentation.onesignal.com/docs/web-push-quickstart and config .env:
+4. Create your own OneSignal account on https://app.onesignal.com/signup, config OneSiganal by https://documentation.onesignal.com/docs/web-push-quickstart and config .env:
 
 ONESIGNAL_APP_ID=your_APP_ID
 USER_AUTH_KEY=your_AUTH_KEY
 ONESIGNAL_REST_API_KEY=your_REST_API_KEY
 
-4. Run `npm run install && npm run dev`
-5. Update composer `composer update`
-6. Installing composer packages `composer install`
-7. Make migrate `php artisan migrate`
-8. Start local server and start scripts: 
+5. Run `npm run install && npm run dev`
+6. Update composer `composer update`
+7. Installing composer packages `composer install`
+8. Make migrate `php artisan migrate`
+9. Start local server and start scripts: 
 
 `php artisan serve`
 `npm run watch`
