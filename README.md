@@ -5,9 +5,10 @@ This app allows users to create events on the site and get push notification whe
 
 ## Requirements
 
-* PHP ^7.3|^8.0"
+* PHP 7.4
 * Composer
 * Node js 12.22.4
+* NPM 6.14.14
 
 ## How to Deploy
 
