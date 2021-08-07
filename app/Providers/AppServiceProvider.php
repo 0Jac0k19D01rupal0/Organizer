@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\EventsEloquentRepository;
-use App\Repositories\EventsRepository;
 
 class AppServiceProvider extends ServiceProvider
 {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
+
 class CalendarController extends Controller
 {
     /**
@@ -21,6 +23,6 @@ class CalendarController extends Controller
      */
     public function index()
     {
-        return view('calendar');
+        return view('calendar', );
     }
 }

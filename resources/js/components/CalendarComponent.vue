@@ -71,7 +71,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
 
 
-
 export default {
     components: {
         Fullcalendar
@@ -167,6 +166,5 @@ export default {
 <style lang="css">
 @import "~@fullcalendar/core/main.css";
 @import "~@fullcalendar/daygrid/main.css";
-
 </style>
 

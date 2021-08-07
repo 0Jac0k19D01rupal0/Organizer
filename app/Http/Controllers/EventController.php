@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use OneSignal;
 use App\Models\Event;
 use App\Http\Requests\EventRequest;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\EventResource;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,11 +32,12 @@ class EventController extends Controller
     {
         $new_event = Event::create($request->all());
 
-        // Create push notification
         $event_name = $request->input('event_name');
         $event_start = $request->input('start_date');
 
-        $this->createPushNotification($event_name, $event_start);
+        // Create push notification and add push id to database
+        $new_event->push_id = $this->createPushNotification($event_name, $event_start);
+        $new_event->save();
 
         return response()->json([
             'date' => new EventResource($new_event),
@@ -65,10 +67,15 @@ class EventController extends Controller
     public function update(EventRequest $request, Event $event)
     {
         $event->update($request->all());
+        $push_id = $event->get('push_id');
 
         $event_name = $request->input('event_name');
         $event_start = $request->input('start_date');
-        $this->testTimeNotification($event_name, $event_start);
+
+        // Cancel old push notification and create new
+        \OneSignal::deleteNotification($push_id);
+        $this->createPushNotification($event_name, $event_start);
+
 
         return response()->json([
             'data' => new EventResource($event),
@@ -106,6 +113,11 @@ class EventController extends Controller
         $params['contents'] = $contents;
         $params['send_after'] = $start_date;
 
-         \OneSignal::sendNotificationCustom($params);
+        /// In this part get response from OneSignal
+        $dataOneSignal = \OneSignal::sendNotificationCustom($params);
+        $responseOneSignal = $dataOneSignal->getBody();
+        $decodedResponse = json_decode($responseOneSignal);
+
+        return $decodedResponse->id;
     }
 }
